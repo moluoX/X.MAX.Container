@@ -57,7 +57,7 @@ namespace X.MAX.Container
         {
             if (_root == null)
             {
-                _root = new RedBlackTreeNode<TKey, TValue>(key, value, RedOrBlack.Black, null);
+                _root = new RedBlackTreeNode<TKey, TValue>(key, value, false, null);
                 return;
             }
 
@@ -69,7 +69,6 @@ namespace X.MAX.Container
         {
             Split4node(node);
 
-            RedBlackTreeNode<TKey, TValue> child;
             var c = Comparer(key, node.Key);
             if (c == 0)
             {
@@ -77,28 +76,26 @@ namespace X.MAX.Container
                 node.Value = value;
                 return;
             }
-            else if (c < 0)
+
+            RedBlackTreeNode<TKey, TValue> child;
+            if (c < 0)
             {
-                child = node.LeftChild;
-                if (child != null)
+                if (node.LeftChild != null)
                 {
-                    InsertInner(child, key, value);
+                    InsertInner(node.LeftChild, key, value);
                     return;
                 }
-
-                child = new RedBlackTreeNode<TKey, TValue>(key, value, RedOrBlack.Red, node);
+                child = new RedBlackTreeNode<TKey, TValue>(key, value, true, node);
                 node.LeftChild = child;
             }
             else
             {
-                child = node.RightChild;
-                if (child != null)
+                if (node.RightChild != null)
                 {
-                    InsertInner(child, key, value);
+                    InsertInner(node.RightChild, key, value);
                     return;
                 }
-
-                child = new RedBlackTreeNode<TKey, TValue>(key, value, RedOrBlack.Red, node);
+                child = new RedBlackTreeNode<TKey, TValue>(key, value, true, node);
                 node.RightChild = child;
             }
             FixUp(child);
@@ -106,29 +103,29 @@ namespace X.MAX.Container
 
         private void FixUp(RedBlackTreeNode<TKey, TValue> node)
         {
-            if (node.Color == RedOrBlack.Black) return;
+            if (!node.IsRed) return;
             var parent = node.Parent;
             if (parent == null)
             {
                 //root color is black
-                node.Color = RedOrBlack.Black;
+                node.IsRed = false;
                 return;
             }
 
-            if (node == parent.LeftChild && parent.Color == RedOrBlack.Red)
+            if (node == parent.LeftChild && parent.IsRed)
             {
                 RightRotate(parent);
             }
             else if (node == parent.RightChild)
             {
-                if (parent.Color == RedOrBlack.Red)
+                if (parent.IsRed)
                 {
                     LeftRotate(node);
                     RightRotate(node);
                 }
                 else
                 {
-                    if (parent.LeftChild?.Color == RedOrBlack.Red) return;
+                    if (parent.LeftChild?.IsRed == true) return;
                     LeftRotate(node);
                 }
             }
@@ -136,11 +133,11 @@ namespace X.MAX.Container
 
         private void Split4node(RedBlackTreeNode<TKey, TValue> node)
         {
-            if (node.LeftChild?.Color == RedOrBlack.Red && node.RightChild?.Color == RedOrBlack.Red)
+            if (node.LeftChild?.IsRed == true && node.RightChild?.IsRed == true)
             {
-                node.Color = RedOrBlack.Red;
-                node.LeftChild.Color = RedOrBlack.Black;
-                node.RightChild.Color = RedOrBlack.Black;
+                node.IsRed = true;
+                node.LeftChild.IsRed = false;
+                node.RightChild.IsRed = false;
                 FixUp(node);
             }
         }
@@ -188,9 +185,9 @@ namespace X.MAX.Container
 
         private void SwitchColor(RedBlackTreeNode<TKey, TValue> a, RedBlackTreeNode<TKey, TValue> b)
         {
-            var tmp = a.Color;
-            a.Color = b.Color;
-            b.Color = tmp;
+            var tmp = a.IsRed;
+            a.IsRed = b.IsRed;
+            b.IsRed = tmp;
         }
 
         /// <summary>
@@ -233,28 +230,12 @@ namespace X.MAX.Container
     {
         public TKey Key { get; set; }
         public TValue Value { get; set; }
-        public RedOrBlack Color { get; set; }
+        public bool IsRed { get; set; }
         public RedBlackTreeNode<TKey, TValue> LeftChild { get; set; }
         public RedBlackTreeNode<TKey, TValue> RightChild { get; set; }
         public RedBlackTreeNode<TKey, TValue> Parent { get; set; }
 
         public RedBlackTreeNode() { }
-        public RedBlackTreeNode(TKey key, TValue value, RedOrBlack color, RedBlackTreeNode<TKey, TValue> parent) => (Key, Value, Color, Parent) = (key, value, color, parent);
-    }
-
-    /// <summary>
-    /// Red Or Black
-    /// </summary>
-    public enum RedOrBlack
-    {
-        /// <summary>
-        /// Red
-        /// </summary>
-        Red,
-
-        /// <summary>
-        /// Black
-        /// </summary>
-        Black
+        public RedBlackTreeNode(TKey key, TValue value, bool isRed, RedBlackTreeNode<TKey, TValue> parent) => (Key, Value, IsRed, Parent) = (key, value, isRed, parent);
     }
 }

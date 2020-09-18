@@ -143,20 +143,5 @@
             <typeparam name="TKey">key type</typeparam>
             <typeparam name="TValue">value type</typeparam>
         </member>
-        <member name="T:X.MAX.Container.RedOrBlack">
-            <summary>
-            Red Or Black
-            </summary>
-        </member>
-        <member name="F:X.MAX.Container.RedOrBlack.Red">
-            <summary>
-            Red
-            </summary>
-        </member>
-        <member name="F:X.MAX.Container.RedOrBlack.Black">
-            <summary>
-            Black
-            </summary>
-        </member>
     </members>
 </doc>
