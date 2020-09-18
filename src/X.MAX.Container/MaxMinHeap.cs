@@ -8,7 +8,7 @@ namespace X.MAX.Container
     /// max heap or min heap
     /// </summary>
     /// <typeparam name="T">element type</typeparam>
-    public class MaxMinHeap<T>
+    public sealed class MaxMinHeap<T>
     {
         private MaxOrMin _maxOrMin;
         private T[] _data = new T[100];
@@ -21,7 +21,7 @@ namespace X.MAX.Container
         {
             get
             {
-                if (_comparer == null && typeof(T) is IComparable<T>)
+                if (_comparer == null)
                     _comparer = (a, b) => (a as IComparable<T>).CompareTo(b);
                 return _comparer;
             }

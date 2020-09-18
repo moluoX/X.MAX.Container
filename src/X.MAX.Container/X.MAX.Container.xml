@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>X.MAX.Container</name>
+    </assembly>
+    <members>
+        <member name="T:X.MAX.Container.MaxMinHeap`1">
+            <summary>
+            max heap or min heap
+            </summary>
+            <typeparam name="T">element type</typeparam>
+        </member>
+        <member name="P:X.MAX.Container.MaxMinHeap`1.Comparer">
+            <summary>
+            compare element
+            </summary>
+        </member>
+        <member name="M:X.MAX.Container.MaxMinHeap`1.#ctor(X.MAX.Container.MaxOrMin)">
+            <summary>
+            .ctor
+            </summary>
+            <param name="maxOrMin">max heap or min heap</param>
+        </member>
+        <member name="M:X.MAX.Container.MaxMinHeap`1.#ctor(X.MAX.Container.MaxOrMin,System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            .ctor
+            </summary>
+            <param name="maxOrMin">max heap or min heap</param>
+            <param name="data">elements</param>
+        </member>
+        <member name="M:X.MAX.Container.MaxMinHeap`1.#ctor(X.MAX.Container.MaxOrMin,System.Collections.Generic.IEnumerable{`0},System.Func{`0,`0,System.Int32})">
+            <summary>
+            .ctor
+            </summary>
+            <param name="maxOrMin">max heap or min heap</param>
+            <param name="data">elements</param>
+            <param name="comparer">compare element</param>
+        </member>
+        <member name="M:X.MAX.Container.MaxMinHeap`1.#ctor(X.MAX.Container.MaxOrMin,System.Collections.Generic.IEnumerable{`0},System.Int32,System.Int32)">
+            <summary>
+            .ctor
+            </summary>
+            <param name="maxOrMin">max heap or min heap</param>
+            <param name="data">elements</param>
+            <param name="start">elements start index</param>
+            <param name="end">elements end index, include this</param>
+        </member>
+        <member name="M:X.MAX.Container.MaxMinHeap`1.#ctor(X.MAX.Container.MaxOrMin,System.Collections.Generic.IEnumerable{`0},System.Int32,System.Int32,System.Func{`0,`0,System.Int32})">
+            <summary>
+            .ctor
+            </summary>
+            <param name="maxOrMin">max heap or min heap</param>
+            <param name="data">elements</param>
+            <param name="start">elements start index</param>
+            <param name="end">elements end index, include this</param>
+            <param name="comparer">compare element</param>
+        </member>
+        <member name="P:X.MAX.Container.MaxMinHeap`1.Length">
+            <summary>
+            elements length
+            </summary>
+        </member>
+        <member name="P:X.MAX.Container.MaxMinHeap`1.Top">
+            <summary>
+            the element top of heap
+            </summary>
+        </member>
+        <member name="M:X.MAX.Container.MaxMinHeap`1.Push(`0)">
+            <summary>
+            push a element and self-adjust
+            </summary>
+            <param name="a"></param>
+        </member>
+        <member name="M:X.MAX.Container.MaxMinHeap`1.Pop">
+            <summary>
+            pop the element top of heap and self-adjust
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:X.MAX.Container.MaxMinHeap`1.TryPop(`0@)">
+            <summary>
+            try pop the element top of heap and self-adjust
+            </summary>
+            <param name="r">the element top of heap. if the heap is empty, default of T</param>
+            <returns>the heap is not empty</returns>
+        </member>
+        <member name="T:X.MAX.Container.MaxOrMin">
+            <summary>
+            max heap or min heap
+            </summary>
+        </member>
+        <member name="F:X.MAX.Container.MaxOrMin.Max">
+            <summary>
+            max heap
+            </summary>
+        </member>
+        <member name="F:X.MAX.Container.MaxOrMin.Min">
+            <summary>
+            min heap
+            </summary>
+        </member>
+        <member name="T:X.MAX.Container.RedBlackTree`2">
+            <summary>
+            Red Black Tree (left-leaning)
+            </summary>
+            <typeparam name="TKey">key type</typeparam>
+            <typeparam name="TValue">value type</typeparam>
+        </member>
+        <member name="P:X.MAX.Container.RedBlackTree`2.Comparer">
+            <summary>
+            compare element
+            </summary>
+        </member>
+        <member name="M:X.MAX.Container.RedBlackTree`2.#ctor">
+            <summary>
+            .ctor
+            </summary>
+        </member>
+        <member name="M:X.MAX.Container.RedBlackTree`2.#ctor(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{`0,`1}})">
+            <summary>
+            .ctor
+            </summary>
+        </member>
+        <member name="M:X.MAX.Container.RedBlackTree`2.Insert(`0,`1)">
+            <summary>
+            insert k-v
+            </summary>
+            <param name="key">key</param>
+            <param name="value">value</param>
+        </member>
+        <member name="M:X.MAX.Container.RedBlackTree`2.TryGet(`0,`1@)">
+            <summary>
+            get value
+            </summary>
+            <param name="key">key</param>
+            <param name="value">value, if key was not found, default of TValue</param>
+            <returns>key was found</returns>
+        </member>
+        <member name="T:X.MAX.Container.RedBlackTreeNode`2">
+            <summary>
+            Red Black Tree Node
+            </summary>
+            <typeparam name="TKey">key type</typeparam>
+            <typeparam name="TValue">value type</typeparam>
+        </member>
+        <member name="T:X.MAX.Container.RedOrBlack">
+            <summary>
+            Red Or Black
+            </summary>
+        </member>
+        <member name="F:X.MAX.Container.RedOrBlack.Red">
+            <summary>
+            Red
+            </summary>
+        </member>
+        <member name="F:X.MAX.Container.RedOrBlack.Black">
+            <summary>
+            Black
+            </summary>
+        </member>
+    </members>
+</doc>
