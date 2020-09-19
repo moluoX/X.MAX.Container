@@ -21,6 +21,8 @@ namespace X.MAX.Container.UnitTest
                 { 80, "80" },
                 { 90, "90" },
                 { 100, "100" },
+                { 110, "110" },
+                { 120, "120" }
             };
             var tree = new RedBlackTree<int, string>(dic);
             string value;

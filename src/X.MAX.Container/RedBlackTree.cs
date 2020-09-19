@@ -44,16 +44,40 @@ namespace X.MAX.Container
         {
             foreach (var kv in kvs)
             {
-                Insert(kv.Key, kv.Value);
+                Add(kv.Key, kv.Value);
             }
         }
 
         /// <summary>
-        /// insert k-v
+        /// get value
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="value">value, if key was not found, default of TValue</param>
+        /// <returns>key was found</returns>
+        public bool TryGet(TKey key, out TValue value)
+        {
+            var node = _root;
+            while (node != null)
+            {
+                var c = Comparer(key, node.Key);
+                if (c == 0)
+                {
+                    value = node.Value;
+                    return true;
+                }
+                else if (c < 0) node = node.LeftChild;
+                else node = node.RightChild;
+            }
+            value = default;
+            return false;
+        }
+
+        /// <summary>
+        /// add k-v
         /// </summary>
         /// <param name="key">key</param>
         /// <param name="value">value</param>
-        public void Insert(TKey key, TValue value)
+        public void Add(TKey key, TValue value)
         {
             if (_root == null)
             {
@@ -62,10 +86,10 @@ namespace X.MAX.Container
             }
 
             var node = _root;
-            InsertInner(node, key, value);
+            AddInner(node, key, value);
         }
 
-        private void InsertInner(RedBlackTreeNode<TKey, TValue> node, TKey key, TValue value)
+        private void AddInner(RedBlackTreeNode<TKey, TValue> node, TKey key, TValue value)
         {
             Split4node(node);
 
@@ -82,7 +106,7 @@ namespace X.MAX.Container
             {
                 if (node.LeftChild != null)
                 {
-                    InsertInner(node.LeftChild, key, value);
+                    AddInner(node.LeftChild, key, value);
                     return;
                 }
                 child = new RedBlackTreeNode<TKey, TValue>(key, value, true, node);
@@ -92,7 +116,7 @@ namespace X.MAX.Container
             {
                 if (node.RightChild != null)
                 {
-                    InsertInner(node.RightChild, key, value);
+                    AddInner(node.RightChild, key, value);
                     return;
                 }
                 child = new RedBlackTreeNode<TKey, TValue>(key, value, true, node);
@@ -191,33 +215,81 @@ namespace X.MAX.Container
         }
 
         /// <summary>
-        /// get value
+        /// remove key
         /// </summary>
         /// <param name="key">key</param>
-        /// <param name="value">value, if key was not found, default of TValue</param>
         /// <returns>key was found</returns>
-        public bool TryGet(TKey key, out TValue value)
+        public bool Remove(TKey key)
         {
             var node = _root;
             while (node != null)
             {
                 var c = Comparer(key, node.Key);
-                if (c == 0)
-                {
-                    value = node.Value;
-                    return true;
-                }
-                else if (c < 0)
-                {
-                    node = node.LeftChild;
-                }
-                else
-                {
-                    node = node.RightChild;
-                }
+                if (c == 0) break;
+                else if (c < 0) node = node.LeftChild;
+                else node = node.RightChild;
             }
-            value = default;
-            return false;
+            if (node == null) return false;
+            RemoveNode(node);
+            return true;
+        }
+
+        private void RemoveNode(RedBlackTreeNode<TKey, TValue> node)
+        {
+            if (node.LeftChild != null && node.RightChild != null)
+            {
+                //node has 2 child, find successor and copy kv to node. then remove successor
+                var successor = FindSuccessor(node);
+                node.CopyKV(successor);
+                RemoveNode(successor);
+                return;
+            }
+            //now node has 0 or 1 child
+
+            if (node.IsRed)
+            {
+                //red node has 0 or 2 child, so has 0 child now. then delete node
+                DeleteNode(node);
+                return;
+            }
+            //now node is black
+
+            if (node.LeftChild != null || node.RightChild != null)
+            {
+                //black node has 1 child, so child is red. then replace node by child, set child black
+                var child = DeleteNode(node);
+                child.IsRed = false;
+                return;
+            }
+            //now node is black and has 0 child
+
+            //because node is black, it must has black sibling
+            if (node.Parent.LeftChild != node && node.Parent.LeftChild.LeftChild?.IsRed == true)
+            {
+                //node has left sibling, and sibling has red child. because left-leaning, child must be left child
+
+            }
+        }
+
+        private RedBlackTreeNode<TKey, TValue> FindSuccessor(RedBlackTreeNode<TKey, TValue> node)
+        {
+            var n = node.RightChild;
+            while (true)
+            {
+                if (n.LeftChild == null) return n;
+                n = n.LeftChild;
+            }
+        }
+
+        private RedBlackTreeNode<TKey, TValue> DeleteNode(RedBlackTreeNode<TKey, TValue> node)
+        {
+            var parent = node.Parent;
+            var child = node.LeftChild == null ? node.RightChild : node.LeftChild;
+            if (parent.LeftChild == node) parent.LeftChild = child;
+            else parent.RightChild = child;
+            if (child != null) child.Parent = parent;
+            node.RemoveLink();
+            return child;
         }
     }
 
@@ -237,5 +309,18 @@ namespace X.MAX.Container
 
         public RedBlackTreeNode() { }
         public RedBlackTreeNode(TKey key, TValue value, bool isRed, RedBlackTreeNode<TKey, TValue> parent) => (Key, Value, IsRed, Parent) = (key, value, isRed, parent);
+
+        public void CopyKV(RedBlackTreeNode<TKey, TValue> src)
+        {
+            Key = src.Key;
+            Value = src.Value;
+        }
+
+        public void RemoveLink()
+        {
+            Parent = null;
+            LeftChild = null;
+            RightChild = null;
+        }
     }
 }
