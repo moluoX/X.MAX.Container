@@ -101,7 +101,7 @@
         </member>
         <member name="T:X.MAX.Container.RedBlackTree`2">
             <summary>
-            Red Black Tree (left-leaning)
+            Red Black Tree
             </summary>
             <typeparam name="TKey">key type</typeparam>
             <typeparam name="TValue">value type</typeparam>
@@ -109,6 +109,11 @@
         <member name="P:X.MAX.Container.RedBlackTree`2.Comparer">
             <summary>
             compare element
+            </summary>
+        </member>
+        <member name="P:X.MAX.Container.RedBlackTree`2.Root">
+            <summary>
+            tree root
             </summary>
         </member>
         <member name="M:X.MAX.Container.RedBlackTree`2.#ctor">

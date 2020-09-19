@@ -12,13 +12,13 @@ namespace X.MAX.Container.UnitTest
         [TestMethod]
         public void TestMethod1()
         {
-            var arr = new[] { 32, 71, 67, -32, -71, 56, 37, 4, -37, 79, -56, -67, 28, -28, -79, 70, 29, -70, -29, -4, 77, -77, 74, -74, 17, -17, 69, 29, 88, 23, 68, 84, 13, 56, 67, 1, 65, 58, 70, 82, 37, -29, -88, };
+            var arr = new[] { 3, 28, 43, -43, 75, -28, 68, 96, };
             var tree = new RedBlackTree<int, int>();
             foreach (var b in arr)
             {
                 if (b >= 0) tree.Add(b, b);
                 else tree.Remove(-b);
-                var flag = IsRedBlackTree(tree._root);
+                var flag = IsRedBlackTree(tree.Root);
                 Assert.AreEqual(flag, "");
             }
         }
@@ -27,8 +27,8 @@ namespace X.MAX.Container.UnitTest
         public void TestRandom()
         {
             var random = new Random();
-            int max = 100;
-            int times = 100;
+            int max = 10000;
+            int times = 10000;
             var cache = new List<int>();
             var tree = new RedBlackTree<int, int>();
             var sb = new StringBuilder();
@@ -64,7 +64,7 @@ namespace X.MAX.Container.UnitTest
                             Assert.AreEqual(value, key);
                             break;
                     }
-                    var flag = IsRedBlackTree(tree._root);
+                    var flag = IsRedBlackTree(tree.Root);
                     Assert.AreEqual(flag, "");
                 }
 
@@ -115,10 +115,10 @@ namespace X.MAX.Container.UnitTest
             while (stack.Count > 0)
             {
                 var n = stack.Pop();
-                if (n.RightChild?.IsRed == true && (n.LeftChild == null || !n.LeftChild.IsRed))
-                {
-                    return $"·Ç×óÇã {n.RightChild.Key}";
-                }
+                //if (n.RightChild?.IsRed == true && (n.LeftChild == null || !n.LeftChild.IsRed))
+                //{
+                //    return $"·Ç×óÇã {n.RightChild.Key}";
+                //}
                 if (n.LeftChild == null || n.RightChild == null)
                 {
                     //Ò¶×Ó
