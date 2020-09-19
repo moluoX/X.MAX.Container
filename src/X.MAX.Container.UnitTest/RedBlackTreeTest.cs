@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace X.MAX.Container.UnitTest
@@ -10,34 +12,67 @@ namespace X.MAX.Container.UnitTest
         [TestMethod]
         public void TestMethod1()
         {
-            var dic = new Dictionary<int, string>
+            var arr = new[] { 32, 71, 67, -32, -71, 56, 37, 4, -37, 79, -56, -67, 28, -28, -79, 70, 29, -70, -29, -4, 77, -77, 74, -74, 17, -17, 69, 29, 88, 23, 68, 84, 13, 56, 67, 1, 65, 58, 70, 82, 37, -29, -88, };
+            var tree = new RedBlackTree<int, int>();
+            foreach (var b in arr)
             {
-                { 10, "10" },
-                { 20, "20" },
-                { 30, "30" },
-                { 40, "40" },
-                { 50, "50" },
-                { 60, "60" },
-                { 70, "70" },
-                { 80, "80" },
-                { 90, "90" },
-                { 100, "100" },
-                { 110, "110" },
-                { 120, "120" }
-            };
-            var tree = new RedBlackTree<int, string>(dic);
-            string value;
-            Assert.IsTrue(tree.TryGet(10, out value));
-            Assert.AreEqual(value, "10");
-            Assert.IsTrue(tree.TryGet(70, out value));
-            Assert.AreEqual(value, "70");
-            Assert.IsTrue(tree.TryGet(100, out value));
-            Assert.AreEqual(value, "100");
-            Assert.IsFalse(tree.TryGet(55, out value));
+                if (b >= 0) tree.Add(b, b);
+                else tree.Remove(-b);
+                var flag = IsRedBlackTree(tree._root);
+                Assert.AreEqual(flag, "");
+            }
+        }
 
-            Assert.IsTrue(tree.Remove(80));
+        [TestMethod]
+        public void TestRandom()
+        {
+            var random = new Random();
+            int max = 100;
+            int times = 100;
+            var cache = new List<int>();
+            var tree = new RedBlackTree<int, int>();
+            var sb = new StringBuilder();
+            try
+            {
+                for (int i = 0; i < times; i++)
+                {
+                    var oper = random.Next(4);
+                    int key, index;
+                    switch (oper)
+                    {
+                        case 0:
+                        case 1:
+                            key = random.Next(max);
+                            sb.Append(key + ", ");
+                            if (tree.Add(key, key))
+                                cache.Add(key);
+                            break;
+                        case 2:
+                            if (cache.Count == 0) break;
+                            index = random.Next(cache.Count);
+                            key = cache[index];
+                            sb.Append("-" + key + ", ");
+                            Assert.IsTrue(tree.Remove(key));
+                            cache.RemoveAt(index);
+                            break;
+                        case 3:
+                            if (cache.Count == 0) break;
+                            index = random.Next(cache.Count);
+                            key = cache[index];
+                            int value;
+                            Assert.IsTrue(tree.TryGet(key, out value));
+                            Assert.AreEqual(value, key);
+                            break;
+                    }
+                    var flag = IsRedBlackTree(tree._root);
+                    Assert.AreEqual(flag, "");
+                }
 
-            var sb = PrintTree(tree._root);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         private StringBuilder PrintTree<TKey, TValue>(RedBlackTreeNode<TKey, TValue> node)
@@ -67,6 +102,58 @@ namespace X.MAX.Container.UnitTest
                 queue2.Enqueue(n.RightChild);
             }
             return sb;
+        }
+
+        private string IsRedBlackTree<TKey, TValue>(RedBlackTreeNode<TKey, TValue> root)
+        {
+            if (root == null) return "";
+            var bh = -1;
+            if (root.IsRed) return "根是红色";
+
+            var stack = new Stack<RedBlackTreeNode<TKey, TValue>>();
+            stack.Push(root);
+            while (stack.Count > 0)
+            {
+                var n = stack.Pop();
+                if (n.RightChild?.IsRed == true && (n.LeftChild == null || !n.LeftChild.IsRed))
+                {
+                    return $"非左倾 {n.RightChild.Key}";
+                }
+                if (n.LeftChild == null || n.RightChild == null)
+                {
+                    //叶子
+                    var nbh = CalBH(n);
+                    if (bh == -1) bh = nbh;
+                    else if (bh != nbh)
+                    {
+                        return $"黑高不对 {bh}-{nbh} {n.Key}";
+                    }
+                    continue;
+                }
+                if (n.RightChild != null)
+                {
+                    if (n.IsRed && n.RightChild.IsRed) return $"父 {n.Key} 子 {n.RightChild.Key} 皆红";
+                    stack.Push(n.RightChild);
+                }
+                if (n.LeftChild != null)
+                {
+                    if (n.IsRed && n.LeftChild.IsRed) return $"父 {n.Key} 子 {n.LeftChild.Key} 皆红";
+                    stack.Push(n.LeftChild);
+                }
+            }
+            return "";
+        }
+
+        private int CalBH<TKey, TValue>(RedBlackTreeNode<TKey, TValue> node)
+        {
+            var bh = 1;
+            var up = node;
+            while (up != null)
+            {
+                if (!up.IsRed) bh++;
+                up = up.Parent;
+            }
+            return bh;
         }
     }
 }
