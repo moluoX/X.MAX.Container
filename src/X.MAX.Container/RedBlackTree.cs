@@ -313,13 +313,17 @@ namespace X.MAX.Container
                 if (node.Parent.RightChild == node)
                 {
                     //node has left black sibling, switch color with sibling and parent
-                    SwitchColor(node.Parent, node.Parent.LeftChild);
+                    node.Parent.IsRed = false;
+                    node.Parent.LeftChild.IsRed = true;
                     return;
                 }
                 if (node.Parent.LeftChild == node)
                 {
                     //node has left black sibling, switch color with sibling and parent
-                    SwitchColor(node.Parent, node.Parent.RightChild);
+                    node.Parent.IsRed = false;
+                    node.Parent.RightChild.IsRed = true;
+                    //LeftRotate, because left-leaning
+                    LeftRotate(node.Parent);
                     return;
                 }
             }
@@ -329,14 +333,18 @@ namespace X.MAX.Container
             {
                 //node has left black sibling, set black sibling red
                 node.Parent.LeftChild.IsRed = true;
-
+                RemoveFix(node.Parent);
+                return;
             }
             if (node.Parent.LeftChild == node)
             {
                 //node has right black sibling, set black sibling red
                 node.Parent.RightChild.IsRed = true;
+                //LeftRotate, because left-leaning
+                LeftRotate(node.Parent);
+                RemoveFix(node.Parent.Parent);
+                return;
             }
-            RemoveFix(node.Parent);
         }
 
         private RedBlackTreeNode<TKey, TValue> FindSuccessor(RedBlackTreeNode<TKey, TValue> node)
