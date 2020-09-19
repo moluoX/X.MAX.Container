@@ -138,19 +138,19 @@ namespace X.MAX.Container
 
             if (node == parent.LeftChild && parent.IsRed)
             {
-                RightRotate(parent);
+                RightRotate(parent.Parent);
             }
             else if (node == parent.RightChild)
             {
                 if (parent.IsRed)
                 {
-                    LeftRotate(node);
-                    RightRotate(node);
+                    LeftRotate(parent);
+                    RightRotate(parent.Parent);
                 }
                 else
                 {
                     if (parent.LeftChild?.IsRed == true) return;
-                    LeftRotate(node);
+                    LeftRotate(parent);
                 }
             }
         }
@@ -168,43 +168,40 @@ namespace X.MAX.Container
 
         private void LeftRotate(RedBlackTreeNode<TKey, TValue> node)
         {
+            var child = node.RightChild;
             var parent = node.Parent;
-            parent.RightChild = node.LeftChild;
-            node.LeftChild = parent;
-            SwithParent(node);
-            SwitchColor(node, parent);
+
+            if (parent == null) _root = child;
+            else if (parent.LeftChild == node) parent.LeftChild = child;
+            else parent.RightChild = child;
+
+            child.Parent = parent;
+            var childLeft = child.LeftChild;
+            child.LeftChild = node;
+
+            node.Parent = child;
+            node.RightChild = childLeft;
+
+            SwitchColor(node, child);
         }
 
         private void RightRotate(RedBlackTreeNode<TKey, TValue> node)
         {
+            var child = node.LeftChild;
             var parent = node.Parent;
-            parent.LeftChild = node.RightChild;
-            node.RightChild = parent;
-            SwithParent(node);
-            SwitchColor(node, parent);
-        }
 
-        private void SwithParent(RedBlackTreeNode<TKey, TValue> node)
-        {
-            var parent = node.Parent;
-            var ancestor = parent.Parent;
-            node.Parent = ancestor;
-            parent.Parent = node;
-            if (ancestor != null)
-            {
-                if (ancestor.LeftChild == parent)
-                {
-                    ancestor.LeftChild = node;
-                }
-                else
-                {
-                    ancestor.RightChild = node;
-                }
-            }
-            else
-            {
-                _root = node;
-            }
+            if (parent == null) _root = child;
+            else if (parent.LeftChild == node) parent.LeftChild = child;
+            else parent.RightChild = child;
+
+            child.Parent = parent;
+            var childRight = child.RightChild;
+            child.RightChild = node;
+
+            node.Parent = child;
+            node.LeftChild = childRight;
+
+            SwitchColor(node, child);
         }
 
         private void SwitchColor(RedBlackTreeNode<TKey, TValue> a, RedBlackTreeNode<TKey, TValue> b)
