@@ -30,7 +30,7 @@ namespace X.MAX.Container
         }
         private Func<TKey, TKey, int> _comparer;
 
-        private RedBlackTreeNode<TKey, TValue> _root;
+        public RedBlackTreeNode<TKey, TValue> _root;
 
         /// <summary>
         /// .ctor
@@ -238,34 +238,105 @@ namespace X.MAX.Container
                 //node has 2 child, find successor and copy kv to node. then remove successor
                 var successor = FindSuccessor(node);
                 node.CopyKV(successor);
-                RemoveNode(successor);
-                return;
+                node = successor;
             }
             //now node has 0 or 1 child
+            RemoveFix(node);
+            DeleteNode(node);
+        }
+
+        private void RemoveFix(RedBlackTreeNode<TKey, TValue> node)
+        {
+            //now node has 0 or 1 child
+
+            if (node.Parent == null)
+            {
+                //node is root. then delete it
+                return;
+            }
 
             if (node.IsRed)
             {
                 //red node has 0 or 2 child, so has 0 child now. then delete node
-                DeleteNode(node);
                 return;
             }
             //now node is black
 
-            if (node.LeftChild != null || node.RightChild != null)
+            if (node.LeftChild != null)
             {
                 //black node has 1 child, so child is red. then replace node by child, set child black
-                var child = DeleteNode(node);
-                child.IsRed = false;
+                node.LeftChild.IsRed = false;
+                return;
+            }
+            if (node.RightChild != null)
+            {
+                //black node has 1 child, so child is red. then replace node by child, set child black
+                node.RightChild.IsRed = false;
                 return;
             }
             //now node is black and has 0 child
 
-            //because node is black, it must has black sibling
-            if (node.Parent.LeftChild != node && node.Parent.LeftChild.LeftChild?.IsRed == true)
+            //because node is black, it must has sibling
+            if (node.Parent.RightChild == node && node.Parent.LeftChild.IsRed == true)
             {
-                //node has left sibling, and sibling has red child. because left-leaning, child must be left child
+                //node has left red sibling
+                RightRotate(node.Parent);
+            }
+            else if (node.Parent.LeftChild == node && node.Parent.RightChild.IsRed == true)
+            {
+                //node has right red sibling
+                LeftRotate(node.Parent);
+            }
+            //now sibling is black
+
+            //black sibling has red child
+            if (node.Parent.RightChild == node && node.Parent.LeftChild.LeftChild?.IsRed == true)
+            {
+                //node has left black sibling, and black sibling has red child. because left-leaning, child must be left child
+                RightRotate(node.Parent);
+                node.Parent.Parent.LeftChild.IsRed = false;
+                return;
+            }
+            if (node.Parent.LeftChild == node && node.Parent.RightChild.LeftChild?.IsRed == true)
+            {
+                //node has right black sibling, and black sibling has red child. because left-leaning, child must be left child
+                RightRotate(node.Parent.RightChild);
+                LeftRotate(node.Parent);
+                node.Parent.Parent.RightChild.IsRed = false;
+                return;
+            }
+            //now sibling is black, and black sibling only has black child
+
+            if (node.Parent.IsRed)
+            {
+                //parent is red
+                if (node.Parent.RightChild == node)
+                {
+                    //node has left black sibling, switch color with sibling and parent
+                    SwitchColor(node.Parent, node.Parent.LeftChild);
+                    return;
+                }
+                if (node.Parent.LeftChild == node)
+                {
+                    //node has left black sibling, switch color with sibling and parent
+                    SwitchColor(node.Parent, node.Parent.RightChild);
+                    return;
+                }
+            }
+            //now parent is black, sibling is black, and black sibling only has black child
+
+            if (node.Parent.RightChild == node)
+            {
+                //node has left black sibling, set black sibling red
+                node.Parent.LeftChild.IsRed = true;
 
             }
+            if (node.Parent.LeftChild == node)
+            {
+                //node has right black sibling, set black sibling red
+                node.Parent.RightChild.IsRed = true;
+            }
+            RemoveFix(node.Parent);
         }
 
         private RedBlackTreeNode<TKey, TValue> FindSuccessor(RedBlackTreeNode<TKey, TValue> node)
@@ -282,7 +353,12 @@ namespace X.MAX.Container
         {
             var parent = node.Parent;
             var child = node.LeftChild == null ? node.RightChild : node.LeftChild;
-            if (parent.LeftChild == node) parent.LeftChild = child;
+            if (parent == null)
+            {
+                _root = child;
+                child.IsRed = false;
+            }
+            else if (parent.LeftChild == node) parent.LeftChild = child;
             else parent.RightChild = child;
             if (child != null) child.Parent = parent;
             node.RemoveLink();
@@ -295,7 +371,7 @@ namespace X.MAX.Container
     /// </summary>
     /// <typeparam name="TKey">key type</typeparam>
     /// <typeparam name="TValue">value type</typeparam>
-    sealed class RedBlackTreeNode<TKey, TValue>
+    public sealed class RedBlackTreeNode<TKey, TValue>
     {
         public TKey Key { get; set; }
         public TValue Value { get; set; }
